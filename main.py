@@ -5,9 +5,15 @@ from optparse import OptionParser
 import re
 import regex
 import sqlite3
+import defusedxml
+from defusedxml.ElementTree import fromstring as safe_fromstring
 import pandas as pd
 import requests
 import streamlit as st
+from nltk import FreqDist
+from nltk.translate import *
+from nltk.translate.meteor_score import meteor_score as meteor
+from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from streamlit import components
 from wordcloud import WordCloud, STOPWORDS
 import matplotlib.pyplot as plt
@@ -20,6 +26,7 @@ import gensim.corpora as corpora
 import pyLDAvis.gensim
 import pickle
 import pyLDAvis
+import numpy as np
 
 import nltk
 nltk.download('stopwords')
@@ -29,8 +36,8 @@ from nltk.corpus import stopwords
 from pprint import pprint
 #
 
-# nltk.download('punkt')
-# nltk.download('punkt_tab')
+nltk.download('punkt')
+nltk.download('punkt_tab')
 
 st.title("software testing nation make some noise!!!!")
 st.header("Software testing blogosphere hot topics")
@@ -60,9 +67,7 @@ articles = pd.read_csv('articles.csv')
 #more_stopwords = {'test', 'tests', 'testing', 'every', 'minutes', 'time', 'one', 'two', 'three', 'see', 'met', 'part', 'possible', 'still', 'way', 'says', 'keep', 'tldr', 'first', 'using' }
 #st_words = st_words.union(more_stopwords)
 #text_data = ' '.join(word for word in text_data.split() if word not in st_words)
-
-#articles = articles.drop(columns=['type_of', 'id', 'readable_publish_date', 'slug', 'path', 'url', 'comments', 'public_reactions_count', 'collection_id', 'published_timestamp', 'language', 'subforem_id', 'positive_reactions_count', 'cover_image', 'social_image', 'canonical_url', 'created_at', 'edited_at',  ],
-#axis=1)
+#articles = articles.drop(columns=['type_of', 'id', 'readable_publish_date', 'slug', 'path', 'url', 'comments_count', 'public_reactions_count', 'collection_id', 'published_timestamp', 'language', 'subforem_id', 'positive_reactions_count', 'cover_image', 'social_image', 'canonical_url', 'created_at', 'edited_at', 'crossposted_at', 'published_at', 'last_comment_at', 'reading_time_minutes', 'tag_list', 'user', 'organization', 'flare_tag'])
 
 articles = articles['description']
 #articles = " ".join(articles.astype(str))
@@ -75,8 +80,9 @@ articles.map(lambda x: re.sub('[,.!?]', '', x))
 articles = \
 articles.map(lambda x: x.lower())
 
+stop_plus = ['write', 'work', 'future', 'career', 'evidence', 'essential' ,'page','last' ,'fail' ,'week' ,'guide', 'quality','agents' ,'⭐️⭐️' ,'build', 'built', 'building', 'coding' ,'code', '2026', 'software', 'test', 'tests', 'testing', 'every', 'minutes', 'time', 'one', 'two', 'three', 'see', 'met', 'part', 'possible', 'still', 'way', 'says', 'keep', 'tldr', 'first', 'using', 'actually', 'answer', 'bangalore', 'often', 'move', 'real', 'across', 'small', 'new', 'made', 'team', 'may', 'like', 'whether', 'someone', 'question', 'buy', 'looks', 'look' ]
 stop_words = stopwords.words('english')
-stop_words.extend(['test', 'tests', 'testing', 'every', 'minutes', 'time', 'one', 'two', 'three', 'see', 'met', 'part', 'possible', 'still', 'way', 'says', 'keep', 'tldr', 'first', 'using', 'actually', 'answer', 'bangalore', 'often', 'move', 'real', 'across', 'small', 'new', 'made', 'team', 'may', 'like', 'whether', 'someone', 'question', 'buy', 'looks', 'look' ])
+stop_words.extend(stop_plus)
 
 def sent_to_words(sentences):
     for sentence in sentences:
@@ -87,11 +93,12 @@ def remove_stopwords(texts):
              if word not in stop_words] for doc in texts]
 
 
-#wordcloud eda
+#wordcloud eda----------------------------------------------------------------------------------------------------------
 
 text_data = ','.join(articles.astype(str))
 st_words = set(STOPWORDS)
-more_stopwords = {'test', 'tests', 'testing', 'every', 'minutes', 'time', 'one', 'two', 'three', 'see', 'met', 'part', 'possible', 'still', 'way', 'says', 'keep', 'tldr', 'first', 'using' }
+#more_stopwords = {'software', 'test', 'tests', 'testing', 'every', 'minutes', 'time', 'one', 'two', 'three', 'see', 'met', 'part', 'possible', 'still', 'way', 'says', 'keep', 'tldr', 'first', 'using' }
+more_stopwords = stop_plus
 st_words = st_words.union(more_stopwords)
 text_data = ' '.join(word for word in text_data.split() if word not in st_words)
 wcl = WordCloud().generate(text_data)
@@ -105,6 +112,8 @@ fig, ax = plt.subplots(figsize=(12, 8))
 ax.imshow(wcl)
 plt.axis("off")
 st.pyplot(fig)
+
+#end------------------------------------------------------------------------------------------------------------------
 
 #lda model blogs
 data = articles.tolist()
@@ -120,19 +129,44 @@ print(corpus[:1][0][:30])
 
 
 
-if __name__ == '__main__':
-    num_topics = 12
-    lda_model = gensim.models.LdaMulticore(corpus=corpus, id2word=id2word, num_topics=num_topics)
-    pprint(lda_model.print_topics())
-    doc_lda = lda_model[corpus]
+#if __name__ == '__main__':
+#    num_topics = 12
+#    lda_model = gensim.models.LdaMulticore(corpus=corpus, id2word=id2word, num_topics=num_topics)
+#    pprint(lda_model.print_topics())
+#    doc_lda = lda_model[corpus]
 
     # if 1 == 1:
     #     LDAvis_prepared = pyLDAvis.gensim.prepare(lda_model, corpus, id2word)
     #     html_string = pyLDAvis.prepared_data_to_html(LDAvis_prepared)
     #     components.v1.html(html_string, height=800, scrolling=True)
+#lda end---------------------------------------------------------------------------------------------------------------
+
+#top 10 topics
+filtered_words = []
+
+blog_data = ','.join(articles.astype(str))
+tokenised = word_tokenize(blog_data)
+
+for token in tokenised:
+    if token not in stop_words:
+        if len(token) > 3:
+            filtered_words.append(token)
+fdist = FreqDist(filtered_words)
+fdist_top15 = fdist.most_common(15)
+st.dataframe(fdist_top15)
+#-----------------------------------------------------------------------------------------------------------------------
+
+#tf-idf
 
 
-#
+#tfidf_vector = TfidfVectorizer(stop_words='english')
+#tfidf_result = tfidf_vector.fit_transform(tokenised)
+
+
+
+
+
+
 
 
 
