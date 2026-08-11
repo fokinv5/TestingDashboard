@@ -27,6 +27,7 @@ import pyLDAvis.gensim
 import pickle
 import pyLDAvis
 import numpy as np
+import json
 
 import nltk
 nltk.download('stopwords')
@@ -34,6 +35,8 @@ from nltk.tokenize import word_tokenize
 from nltk.tokenize.treebank import TreebankWordDetokenizer
 from nltk.corpus import stopwords
 from pprint import pprint
+from pathlib import Path
+import glob
 #
 
 nltk.download('punkt')
@@ -80,7 +83,7 @@ articles.map(lambda x: re.sub('[,.!?]', '', x))
 articles = \
 articles.map(lambda x: x.lower())
 
-stop_plus = ['write', 'work', 'future', 'career', 'evidence', 'essential' ,'page','last' ,'fail' ,'week' ,'guide', 'quality','agents' ,'⭐️⭐️' ,'build', 'built', 'building', 'coding' ,'code', '2026', 'software', 'test', 'tests', 'testing', 'every', 'minutes', 'time', 'one', 'two', 'three', 'see', 'met', 'part', 'possible', 'still', 'way', 'says', 'keep', 'tldr', 'first', 'using', 'actually', 'answer', 'bangalore', 'often', 'move', 'real', 'across', 'small', 'new', 'made', 'team', 'may', 'like', 'whether', 'someone', 'question', 'buy', 'looks', 'look' ]
+stop_plus = ['write', 'work', 'future', 'career', 'evidence', 'essential' ,'page','last' ,'fail' ,'week', 'weeks' ,'guide', 'quality','agents' ,'⭐️⭐️' ,'build', 'built', 'building', 'coding' ,'code', '2026', 'software', 'test', 'tests', 'testing', 'every', 'minutes', 'time', 'one', 'two', 'three', 'see', 'met', 'part', 'possible', 'still', 'way', 'says', 'keep', 'tldr', 'first', 'using', 'actually', 'answer', 'bangalore', 'often', 'move', 'real', 'across', 'small', 'new', 'made', 'team', 'may', 'like', 'whether', 'someone', 'question', 'buy', 'looks', 'look', 'need', 'something', 'know', 'telegram', 'use', 'using', 'never', 'nothing', 'right', 'thing', 'dr', 'tl', 'open', 'five', 'strength', 'hundreds', 'get', 'best', 'post', 'elevate', 'checks', 'change', 'problem' ]
 stop_words = stopwords.words('english')
 stop_words.extend(stop_plus)
 
@@ -115,19 +118,17 @@ st.pyplot(fig)
 
 #end------------------------------------------------------------------------------------------------------------------
 
-#lda model blogs
-data = articles.tolist()
-data_words = list(sent_to_words(data))
-
-data_words = remove_stopwords(data_words)
-print(data_words[:1][0][:30])
-
-id2word = corpora.Dictionary(data_words)
-texts = data_words
-corpus = [id2word.doc2bow(text) for text in texts]
-print(corpus[:1][0][:30])
-
-
+#lda model blogs------------------------------------------------------------------------------------------------------
+# data = articles.tolist()
+# data_words = list(sent_to_words(data))
+#
+# data_words = remove_stopwords(data_words)
+# print(data_words[:1][0][:30])
+#
+# id2word = corpora.Dictionary(data_words)
+# texts = data_words
+# corpus = [id2word.doc2bow(text) for text in texts]
+# print(corpus[:1][0][:30])
 
 #if __name__ == '__main__':
 #    num_topics = 12
@@ -141,7 +142,7 @@ print(corpus[:1][0][:30])
     #     components.v1.html(html_string, height=800, scrolling=True)
 #lda end---------------------------------------------------------------------------------------------------------------
 
-#top 10 topics
+#top 10 topics---------------------------------------------------------------------------------------------------------
 filtered_words = []
 
 blog_data = ','.join(articles.astype(str))
@@ -159,9 +160,39 @@ st.dataframe(fdist_top15)
 #tf-idf
 
 
-#tfidf_vector = TfidfVectorizer(stop_words='english')
-#tfidf_result = tfidf_vector.fit_transform(tokenised)
+vectorizer = TfidfVectorizer(min_df=15, max_df = 0.1, sublinear_tf=True, use_idf =True, stop_words = stop_words)
+tfidf_result = vectorizer.fit_transform(tokenised)
+topiclist = vectorizer.get_feature_names_out()
+print(topiclist)
+tfidf_result.toarray()
 
+s = ''
+
+for i in topiclist:
+    s += "- " + i + "\n"
+
+st.markdown(s)
+
+
+#tf-idf on syllabi--------------------------------------------------------------------------------------------
+input_folder = "C:/Users/Varvara/PycharmProjects/PythonProject2/ISTQB_json"
+
+for file in os.listdir(input_folder):
+    if file.lower().endswith(".json"):
+        json_path = os.path.join(input_folder, file)
+
+        with open(json_path, 'r', encoding='utf-8') as json_file:
+            file = json.load(json_file)
+
+        syllabus = re.sub(r'[^A-Za-z\s]', '', str(file))
+        tokenised_syl = word_tokenize(syllabus)
+
+        syl_vectorizer = TfidfVectorizer(min_df=5, max_df=0.3, sublinear_tf=True, use_idf=True, stop_words=stop_words)
+        tfidf_syllabi = syl_vectorizer.fit_transform(tokenised_syl)
+        syl_topics = syl_vectorizer.get_feature_names_out()
+        filename = os.path.basename(json_path).split('/')[-1]
+        print(filename)
+        print(syl_topics)
 
 
 
