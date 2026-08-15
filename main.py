@@ -11,9 +11,11 @@ import pandas as pd
 import requests
 import streamlit as st
 from nltk import FreqDist
+from nltk.metrics.aline import similarity_matrix
 from nltk.translate import *
 from nltk.translate.meteor_score import meteor_score as meteor
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 from streamlit import components
 from wordcloud import WordCloud, STOPWORDS
 import matplotlib.pyplot as plt
@@ -30,20 +32,20 @@ import numpy as np
 import json
 
 import nltk
-nltk.download('stopwords')
+
 from nltk.tokenize import word_tokenize
 from nltk.tokenize.treebank import TreebankWordDetokenizer
 from nltk.corpus import stopwords
 from pprint import pprint
 from pathlib import Path
 import glob
-#
 
+nltk.download('stopwords')
 nltk.download('punkt')
 nltk.download('punkt_tab')
 
-st.title("software testing nation make some noise!!!!")
-st.header("Software testing blogosphere hot topics")
+st.title("Software Testing Topic Digest")
+st.header("What is being discussed in the industry?")
 
 #api
 URL = 'https://dev.to/api/articles'
@@ -83,7 +85,7 @@ articles.map(lambda x: re.sub('[,.!?]', '', x))
 articles = \
 articles.map(lambda x: x.lower())
 
-stop_plus = ['write', 'work', 'future', 'career', 'evidence', 'essential' ,'page','last' ,'fail' ,'week', 'weeks' ,'guide', 'quality','agents' ,'⭐️⭐️' ,'build', 'built', 'building', 'coding' ,'code', '2026', 'software', 'test', 'tests', 'testing', 'every', 'minutes', 'time', 'one', 'two', 'three', 'see', 'met', 'part', 'possible', 'still', 'way', 'says', 'keep', 'tldr', 'first', 'using', 'actually', 'answer', 'bangalore', 'often', 'move', 'real', 'across', 'small', 'new', 'made', 'team', 'may', 'like', 'whether', 'someone', 'question', 'buy', 'looks', 'look', 'need', 'something', 'know', 'telegram', 'use', 'using', 'never', 'nothing', 'right', 'thing', 'dr', 'tl', 'open', 'five', 'strength', 'hundreds', 'get', 'best', 'post', 'elevate', 'checks', 'change', 'problem' ]
+stop_plus = ['free', 'without', 'write', 'work', 'future', 'career', 'evidence', 'essential' ,'page','last' ,'fail' ,'week', 'weeks' ,'guide', 'quality','agents' ,'⭐️⭐️' ,'build', 'built', 'building', 'coding' ,'code', '2026', 'software', 'test', 'tests', 'testing', 'every', 'minutes', 'time', 'one', 'two', 'three', 'see', 'met', 'part', 'possible', 'still', 'way', 'says', 'keep', 'tldr', 'first', 'using', 'actually', 'answer', 'bangalore', 'often', 'move', 'real', 'across', 'small', 'new', 'made', 'team', 'may', 'like', 'whether', 'someone', 'question', 'buy', 'looks', 'look', 'need', 'something', 'know', 'telegram', 'use', 'using', 'never', 'nothing', 'right', 'thing', 'dr', 'tl', 'open', 'five', 'strength', 'hundreds', 'get', 'best', 'post', 'elevate', 'checks', 'change', 'problem' ]
 stop_words = stopwords.words('english')
 stop_words.extend(stop_plus)
 
@@ -159,20 +161,20 @@ st.dataframe(fdist_top15)
 
 #tf-idf
 
+# topiclist = vectorizer.get_feature_names_out()
+# print(topiclist)
+# tfidf_blogs.toarray()
+#
+# s = ''
+#
+# for i in topiclist:
+#     s += "- " + i + "\n"
+#
+# st.markdown(s)
 
-vectorizer = TfidfVectorizer(min_df=15, max_df = 0.1, sublinear_tf=True, use_idf =True, stop_words = stop_words)
-tfidf_result = vectorizer.fit_transform(tokenised)
-topiclist = vectorizer.get_feature_names_out()
-print(topiclist)
-tfidf_result.toarray()
-
-s = ''
-
-for i in topiclist:
-    s += "- " + i + "\n"
-
-st.markdown(s)
-
+syllabi_df = pd.DataFrame(columns=['syllabus', 'keywords'])
+#result_df = pd.DataFrame(columns=['Topic', 'Found in:'])
+syl_corpus = []
 
 #tf-idf on syllabi--------------------------------------------------------------------------------------------
 input_folder = "C:/Users/Varvara/PycharmProjects/PythonProject2/ISTQB_json"
@@ -182,23 +184,73 @@ for file in os.listdir(input_folder):
         json_path = os.path.join(input_folder, file)
 
         with open(json_path, 'r', encoding='utf-8') as json_file:
-            file = json.load(json_file)
+            syllabus = json.load(json_file)
 
-        syllabus = re.sub(r'[^A-Za-z\s]', '', str(file))
-        tokenised_syl = word_tokenize(syllabus)
+        syl_corpus.append(syllabus)
 
-        syl_vectorizer = TfidfVectorizer(min_df=5, max_df=0.3, sublinear_tf=True, use_idf=True, stop_words=stop_words)
+        syllabus_text = re.sub(
+            r'[^A-Za-z\s]',
+            ' ',
+            str(syllabus)
+        )
+
+        tokenised_syl = word_tokenize(syllabus_text)
+
+        syl_vectorizer = TfidfVectorizer(sublinear_tf=True, use_idf=True, stop_words=stop_words)
         tfidf_syllabi = syl_vectorizer.fit_transform(tokenised_syl)
         syl_topics = syl_vectorizer.get_feature_names_out()
         filename = os.path.basename(json_path).split('/')[-1]
-        print(filename)
-        print(syl_topics)
+        #print(filename)
+        #print(syl_topics)
+        syllabi_df.loc[len(syllabi_df)] = [filename, syl_topics]
+
+
+#st.dataframe(syllabi_df)
+
+#compare blogs to syllabi
+
+syl_documents = []
+
+for syllabus in syl_corpus:
+    syllabus_text = re.sub(r'[^A-Za-z\s]', ' ', str(syllabus))
+    syl_documents.append(syllabus_text)
+
+vectorizer = TfidfVectorizer(min_df=5, max_df=0.8, sublinear_tf=True, use_idf=True, stop_words=stop_words)
+tfidf_all_syllabi = vectorizer.fit_transform(syl_documents)
+#vectorizer = TfidfVectorizer(min_df=15, max_df = 0.5, sublinear_tf=True, use_idf =True, stop_words = stop_words)
+blog_text = re.sub(r'[^A-Za-z\s]', ' ', str(tokenised))
+tfidf_blogs = vectorizer.transform([blog_text])
+topic_list = vectorizer.get_feature_names_out()
+print(topic_list)
+
+print("Syllabi TF-IDF shape:", tfidf_all_syllabi.shape)
+print("Blog TF-IDF shape:", tfidf_blogs.shape)
+
+
+
+similarity_matrix = cosine_similarity(tfidf_blogs, tfidf_all_syllabi)[0]
+
+best_indices = similarity_matrix.argsort()[::-1][:10]
+
+for i in best_indices:
+    print(
+        syllabi_df.iloc[i]["syllabus"],
+        similarity_matrix[i]
+    )
+print(similarity_matrix)
+
+print("Similarity shape:", similarity_matrix.shape)
 
 
 
 
-
-
+# for i in topiclist:
+#     for ind in syllabi_df.index:
+#         if re.search(i, syllabi_df['keywords'][ind]):
+#             result_df.loc[len(result_df)] = [i, syllabi_df['syllabus'][ind]]
+#
+#
+# st.dataframe(result_df)
 
 
 # vec = CountVectorizer(stop_words='english')
