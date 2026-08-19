@@ -73,15 +73,6 @@ df = pd.DataFrame(articles)
 df.to_csv('articles.csv', index=False)
 articles = pd.read_csv('articles.csv')
 
-# text_data = " ".join(df['description'].astype(str))
-# text_data = re.sub(r'[^A-Za-z\s]', '', text_data)
-# text_data = text_data.lower()
-#st_words = set(STOPWORDS)
-#more_stopwords = {'test', 'tests', 'testing', 'every', 'minutes', 'time', 'one', 'two', 'three', 'see', 'met', 'part', 'possible', 'still', 'way', 'says', 'keep', 'tldr', 'first', 'using' }
-#st_words = st_words.union(more_stopwords)
-#text_data = ' '.join(word for word in text_data.split() if word not in st_words)
-#articles = articles.drop(columns=['type_of', 'id', 'readable_publish_date', 'slug', 'path', 'url', 'comments_count', 'public_reactions_count', 'collection_id', 'published_timestamp', 'language', 'subforem_id', 'positive_reactions_count', 'cover_image', 'social_image', 'canonical_url', 'created_at', 'edited_at', 'crossposted_at', 'published_at', 'last_comment_at', 'reading_time_minutes', 'tag_list', 'user', 'organization', 'flare_tag'])
-
 articles = articles['description']
 #articles = " ".join(articles.astype(str))
 
@@ -130,26 +121,7 @@ with col1:
 #end------------------------------------------------------------------------------------------------------------------
 
 #lda model blogs------------------------------------------------------------------------------------------------------
-# data = articles.tolist()
-# data_words = list(sent_to_words(data))
-#
-# data_words = remove_stopwords(data_words)
-# print(data_words[:1][0][:30])
-#
-# id2word = corpora.Dictionary(data_words)
-# texts = data_words
-# corpus = [id2word.doc2bow(text) for text in texts]
-# print(corpus[:1][0][:30])
-#
-# if __name__ == '__main__':
-#    num_topics = 5
-#    lda_model = gensim.models.LdaMulticore(corpus=corpus, id2word=id2word, num_topics=num_topics)
-#    print(lda_model.print_topics())
-#    doc_lda = lda_model[corpus]
-#
-#    if 1 == 1:
-#         LDAvis_prepared = pyLDAvis.gensim.prepare(lda_model, corpus, id2word, R=15)
-#         html_string = pyLDAvis.prepared_data_to_html(LDAvis_prepared)
+
 html_lda = open('blogs_lda.html', 'r')
 raw_html = html_lda.read().encode("utf-8")
 raw_html = base64.b64encode(raw_html).decode()
