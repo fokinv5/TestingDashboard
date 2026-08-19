@@ -168,7 +168,7 @@ syllabi_df = pd.DataFrame(columns=['syllabus', 'keywords'])
 syl_corpus = []
 
 #tf-idf on syllabi--------------------------------------------------------------------------------------------
-input_folder = "C:/Users/Varvara/PycharmProjects/PythonProject2/ISTQB_json"
+input_folder = "./ISTQB_json"
 
 for file in os.listdir(input_folder):
     if file.lower().endswith(".json"):
