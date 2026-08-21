@@ -59,7 +59,7 @@ col1, col2 = st.columns([1, 1], gap='small', border=False)
 URL = 'https://dev.to/api/articles'
 params = {
     'tag' : 'testing',
-    'page' : '>1',
+    'page' : '1',
     'per_page' : '1000'
 }
 
