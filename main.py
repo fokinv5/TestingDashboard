@@ -52,7 +52,7 @@ st.set_page_config(layout="wide")
 st.title(":color[Software Testing Topic Digest]{foreground=#20b2aa}", text_alignment="center")
 st.header(":color[What is being discussed in the industry?]{foreground=#008b8b}", text_alignment="left")
 devlink = 'https://dev.to/t/testing'
-st.markdown('''Over 1000 blog posts about software testing from the blogging platform [DEV.to](%s) were analysed to narrow down the most discussed topics in the software testing industry.''' %devlink)
+st.markdown('''1000 blog posts about software testing from the blogging platform [DEV.to](%s) were analysed to narrow down the most discussed topics in the software testing industry.''' %devlink)
 col1, col2 = st.columns([1, 1], gap='small', border=False)
 
 #api
