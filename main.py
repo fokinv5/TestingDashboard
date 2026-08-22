@@ -120,7 +120,7 @@ tagged_tokens = pos_tag(tokenised)
 for word, tag in tagged_tokens:
         articles_lem.append(
             lemmatizer.lemmatize(word, get_wordnet_pos(tag)))
-tokenised = word_tokenize(' '.join(articles_lem))
+tokenised = word_tokenize(','.join(articles_lem))
 
 #wordcloud eda----------------------------------------------------------------------------------------------------------
 
