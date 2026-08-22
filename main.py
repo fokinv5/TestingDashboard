@@ -123,8 +123,8 @@ for word, tag in tagged_tokens:
 tokenised = word_tokenize(' '.join(articles_lem))
 
 #wordcloud eda----------------------------------------------------------------------------------------------------------
-text_data = remove_stopwords(tokenised)
-#text_data = ','.join(text_data)
+tokenised_stop = remove_stopwords(tokenised)
+text_data = ','.join(tokenised_stop)
 # st_words = set(STOPWORDS)
 # more_stopwords = stop_plus
 # st_words = st_words.union(more_stopwords)
