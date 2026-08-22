@@ -124,12 +124,12 @@ tokenised = word_tokenize(' '.join(articles_lem))
 
 #wordcloud eda----------------------------------------------------------------------------------------------------------
 
-#text_data = ','.join(tokenised.astype(str))
+text_data = ','.join(tokenised)
 # st_words = set(STOPWORDS)
 # more_stopwords = stop_plus
 # st_words = st_words.union(more_stopwords)
 # text_data = ' '.join(word for word in text_data.split() if word not in st_words)
-wcl = WordCloud().generate(tokenised)
+wcl = WordCloud().generate(text_data)
 #st.dataframe(df)
 
 plt.imshow(wcl, interpolation='bilinear')
