@@ -96,9 +96,9 @@ def sent_to_words(sentences):
     for sentence in sentences:
         yield(gensim.utils.simple_preprocess(str(sentence), deacc=True))
 
-def remove_stopwords(texts):
-    return [[word for word in simple_preprocess(str(doc))
-             if word not in stop_words] for doc in texts]
+# def remove_stopwords(texts):
+#     return [[word for word in simple_preprocess(str(doc))
+#              if word not in stop_words] for doc in texts]
 def get_wordnet_pos(tag):
     if tag.startswith('J'):
         return 'a'
@@ -123,12 +123,13 @@ for word, tag in tagged_tokens:
 tokenised = word_tokenize(' '.join(articles_lem))
 
 #wordcloud eda----------------------------------------------------------------------------------------------------------
-tokenised_stop = remove_stopwords(tokenised)
-text_data = ','.join(tokenised_stop)
-# st_words = set(STOPWORDS)
-# more_stopwords = stop_plus
-# st_words = st_words.union(more_stopwords)
-# text_data = ' '.join(word for word in text_data.split() if word not in st_words)
+
+
+text_data = ','.join(tokenised)
+st_words = set(STOPWORDS)
+more_stopwords = stop_plus
+st_words = st_words.union(more_stopwords)
+text_data = ' '.join(word for word in text_data.split() if word not in st_words)
 wcl = WordCloud().generate(text_data)
 #st.dataframe(df)
 
