@@ -125,7 +125,7 @@ tokenised = word_tokenize(' '.join(articles_lem))
 #wordcloud eda----------------------------------------------------------------------------------------------------------
 
 
-text_data = ','.join(tokenised)
+text_data = ','.join(articles_lem)
 st_words = set(STOPWORDS)
 more_stopwords = stop_plus
 st_words = st_words.union(more_stopwords)
