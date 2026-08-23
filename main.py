@@ -168,7 +168,7 @@ filtered_words = []
 
 for token in tokenised:
     if token not in stop_words:
-        if len(token) > 2:
+        if len(token) > 3:
             filtered_words.append(token)
 fdist = FreqDist(filtered_words)
 fdist_top15 = fdist.most_common(15)
