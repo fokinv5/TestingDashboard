@@ -130,16 +130,11 @@ tokenised = word_tokenize(blog_data)
 #wordcloud eda----------------------------------------------------------------------------------------------------------
 
 
-#text_data = ','.join(articles_lem)
-# st_words = set(STOPWORDS)
-# more_stopwords = stop_plus
-# st_words = st_words.union(more_stopwords)
-# text_data = ' '.join(word for word in text_data.split() if word not in st_words)
-text_data = []
-for token in tokenised:
-    if token not in stop_words:
-        text_data.append(token)
-text_data = ','.join(text_data)
+text_data = ','.join(articles.astype(str))
+st_words = set(STOPWORDS)
+more_stopwords = stop_plus
+st_words = st_words.union(more_stopwords)
+text_data = ' '.join(word for word in text_data.split() if word not in st_words)
 wcl = WordCloud().generate(text_data)
 #st.dataframe(df)
 
