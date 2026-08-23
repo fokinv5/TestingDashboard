@@ -118,9 +118,11 @@ tokenised = word_tokenize(blog_data)
 tagged_tokens = pos_tag(tokenised)
 
 for word, tag in tagged_tokens:
-    if len(word) > 2:
+    if len(word) > 3:
         articles_lem.append(
             lemmatizer.lemmatize(word, get_wordnet_pos(tag)))
+    else :
+        articles_lem.append(word)
 tokenised = word_tokenize(','.join(articles_lem))
 
 #wordcloud eda----------------------------------------------------------------------------------------------------------
