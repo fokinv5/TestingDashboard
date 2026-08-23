@@ -90,7 +90,7 @@ articles.map(lambda x: x.lower())
 lemmatizer = WordNetLemmatizer()
 
 
-stop_plus = ['n`t', 'make','start' ,'constantly','free', 'without', 'write', 'work', 'future', 'career', 'evidence', 'essential' ,'page','last' ,'week', 'weeks' ,'guide', 'quality','⭐️⭐️' ,'build', 'built', 'building', 'coding' ,'code', '2026', 'software', 'test', 'tests', 'testing', 'every', 'minutes', 'time', 'one', 'two', 'three', 'see', 'met', 'part', 'possible', 'still', 'way', 'says', 'keep', 'tldr', 'first', 'using', 'actually', 'answer', 'bangalore', 'often', 'move', 'real', 'across', 'small', 'new', 'made', 'team', 'may', 'like', 'whether', 'someone', 'question', 'buy', 'looks', 'look', 'need', 'something', 'know', 'telegram', 'use', 'using', 'never', 'nothing', 'right', 'thing', 'dr', 'tl', 'open', 'five', 'strength', 'hundreds', 'get', 'best', 'post', 'elevate', 'checks', 'change', 'problem' ]
+stop_plus = ['make','start' ,'constantly','free', 'without', 'write', 'work', 'future', 'career', 'evidence', 'essential' ,'page','last' ,'week', 'weeks' ,'guide', 'quality','⭐️⭐️' ,'build', 'built', 'building', 'coding' ,'code', '2026', 'software', 'test', 'tests', 'testing', 'every', 'minutes', 'time', 'one', 'two', 'three', 'see', 'met', 'part', 'possible', 'still', 'way', 'says', 'keep', 'tldr', 'first', 'using', 'actually', 'answer', 'bangalore', 'often', 'move', 'real', 'across', 'small', 'new', 'made', 'team', 'may', 'like', 'whether', 'someone', 'question', 'buy', 'looks', 'look', 'need', 'something', 'know', 'telegram', 'use', 'using', 'never', 'nothing', 'right', 'thing', 'dr', 'tl', 'open', 'five', 'strength', 'hundreds', 'get', 'best', 'post', 'elevate', 'checks', 'change', 'problem' ]
 stop_words = stopwords.words('english')
 stop_words.extend(stop_plus)
 
@@ -168,7 +168,7 @@ filtered_words = []
 
 for token in tokenised:
     if token not in stop_words:
-        if len(token) > 2:
+        if len(token) > 3:
             filtered_words.append(token)
 fdist = FreqDist(filtered_words)
 fdist_top15 = fdist.most_common(15)
