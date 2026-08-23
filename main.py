@@ -4,6 +4,8 @@ import base64
 import os
 from optparse import OptionParser
 import re
+
+import contractions
 import regex
 import sqlite3
 import defusedxml
@@ -84,6 +86,8 @@ articles.map(lambda x: re.sub('[,.!?]', '', x))
 
 articles = \
 articles.map(lambda x: x.lower())
+
+articles = contractions.fix(articles)
 
 lemmatizer = WordNetLemmatizer()
 
