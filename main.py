@@ -162,6 +162,7 @@ v1components.iframe(f"data:text/html;base64,{raw_html}", height=800, width=1260)
 #lda end---------------------------------------------------------------------------------------------------------------
 
 #top 15 topics---------------------------------------------------------------------------------------------------------
+#code referenced: https://python.plainenglish.io/how-to-print-the-top-ten-words-of-a-list-with-python-40a9f6fd7be
 filtered_words = []
 
 for token in tokenised:
@@ -248,7 +249,7 @@ print("Blog TF-IDF shape:", tfidf_blogs.shape)
 
 similarity_matrix = cosine_similarity(tfidf_blogs, tfidf_all_syllabi)[0]
 
-best_indices = similarity_matrix.argsort()[::-1][:24]
+best_indices = similarity_matrix.argsort()
 best_indices_df = pd.DataFrame(columns=['ISTQB Syllabus', 'Similarity Score'])
 for i in best_indices:
     best_indices_df.loc[len(best_indices_df)] = [syllabi_df.iloc[i]["syllabus"], similarity_matrix[i]]
