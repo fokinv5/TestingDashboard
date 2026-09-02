@@ -265,7 +265,6 @@ st.header(":color[Which teaching materials are aligned with the industry discuss
 st.text("The International Software Testing Qualifications Board, or ISTQB, is a global software testing certification board that offers the Certified Tester qualification scheme built around syllabi of various depths and areas of testing knowledge. The chart below analyses the similarity of the topics discussed by software testing professionals in blogs to each ISTQB syllabus, and orders the syllabi by similarity score.")
 syl_chart = best_indices_df
 fig = px.bar(syl_chart,x='Similarity Score', y='ISTQB Syllabus', color='Similarity Score', orientation='h', width=800, height=800,  color_discrete_sequence=px.colors.sequential.Viridis)
-fig.update_yaxes(autorange="reversed")
 st.plotly_chart(fig)
 
 url = "https://istqb.org/certifications"
