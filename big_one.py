@@ -5,6 +5,8 @@ import pymupdf
 import re
 import json
 
+#The work of Attwood and Williams (2024) was referenced for this code
+
 input_folder = "./ISTQB_sy"
 output_folder = "./ISTQB_json"
 
