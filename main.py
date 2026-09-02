@@ -81,11 +81,9 @@ articles = pd.read_csv('articles.csv')
 articles = articles['description']
 #articles = " ".join(articles.astype(str))
 
-articles = \
-articles.map(lambda x: re.sub('[,.!?]', '', x))
+articles = articles.map(lambda x: re.sub('[,.!?]', '', x))
 
-articles = \
-articles.map(lambda x: x.lower())
+articles = articles.map(lambda x: x.lower())
 
 lemmatizer = WordNetLemmatizer()
 
